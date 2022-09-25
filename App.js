@@ -14,6 +14,8 @@ const cookieParser = require('cookie-parser')
 
 const methodOverride = require('method-override')
 
+const passport = require('./src/utils/passport.utils')
+
 const flash = require('connect-flash')
 
 app.set('view engine', 'ejs')
@@ -39,6 +41,8 @@ app.use(session({
 }))
 
 app.use(flash())
+
+app.use(passport.initialize())
 
 // Routee
 app.use(indexRoute)

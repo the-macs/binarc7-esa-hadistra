@@ -4,7 +4,7 @@ const db = new Sequelize(process.env.PGDATABASE, process.env.PGUSER, process.env
     host: process.env.PGHOST,
     dialect: process.env.DBDRIVER,
     port: process.env.PGPORT,
-    logging: true
+    logging: false
 });
 db
     .authenticate()

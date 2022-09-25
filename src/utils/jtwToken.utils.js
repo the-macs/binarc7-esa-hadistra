@@ -1,22 +1,7 @@
 const jwt = require('jsonwebtoken')
 
-const model = require('./../models/index')
-
-const userGame = model.database.user_game
-const userGameBiodata = model.database.user_game_biodata
-
 module.exports = {
-    generateToken: async (id) => {
-        const user = await userGame.findOne({
-            where: { id },
-            include: {
-                model: userGameBiodata,
-                as: 'user_game_biodata',
-                attributes: ['name'],
-                required: true
-            }
-        })
-
+    generateToken: async (user) => {
         const token = jwt.sign(
             {
                 id: user.id,
@@ -26,7 +11,7 @@ module.exports = {
             },
             process.env.JWT_SECRET,
             {
-                expiresIn: '24h'
+                expiresIn: '1h'
             }
         )
 
@@ -43,6 +28,5 @@ module.exports = {
         }
 
         return false
-
     }
 }

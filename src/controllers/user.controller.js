@@ -95,7 +95,15 @@ module.exports = {
         const { id, name, password } = req.body
 
         try {
-            const user = await userGame.findOne({ where: { id } })
+            const user = await userGame.findOne({
+                where: { id },
+                include: {
+                    model: userGameBiodata,
+                    as: 'user_game_biodata',
+                    attributes: ['name'],
+                    required: true
+                }
+            })
 
             let newPassword = user.password
 
@@ -115,7 +123,9 @@ module.exports = {
                 await userGameBiodata.update({ name }, { where: { user_game_id: id }, transaction })
             })
 
-            const token = await generateToken(id)
+            user.user_game_biodata.name = name
+
+            const token = await generateToken(user)
 
             req.header.authorization = token
 

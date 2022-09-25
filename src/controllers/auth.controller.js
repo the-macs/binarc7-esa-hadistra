@@ -3,6 +3,7 @@ const bcrypt = require('bcrypt')
 const model = require('./../models/index')
 
 const userGame = model.database.user_game
+const userGameBiodata = model.database.user_game_biodata
 
 const { generateToken } = require('./../utils/jtwToken.utils')
 
@@ -11,11 +12,19 @@ module.exports = {
         const { username, password } = req.body
 
         try {
-            const user = await userGame.findOne({ where: { username } })
+            const user = await userGame.findOne({
+                where: { username },
+                include: {
+                    model: userGameBiodata,
+                    as: 'user_game_biodata',
+                    attributes: ['name'],
+                    required: true
+                }
+            })
 
             const match = await bcrypt.compare(password, user.password);
             if (match) {
-                const token = await generateToken(user.id)
+                const token = await generateToken(user)
 
                 req.header.authorization = token
 

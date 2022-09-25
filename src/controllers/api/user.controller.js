@@ -7,6 +7,8 @@ const userGameBiodata = model.database.user_game_biodata
 
 const { responseSuccess, responseError } = require('../../utils/responseFormatter.utils')
 
+const { generateToken } = require('../../utils/jtwToken.utils')
+
 module.exports = {
     index: async (req, res) => {
         if (Object.keys(req.body) == 0) {
@@ -154,6 +156,29 @@ module.exports = {
             }
         } else {
             res.status(404).json(responseError('User not found'))
+        }
+    },
+    auth: async (req, res) => {
+        const { username, password } = req.body
+        try {
+            const user = await userGame.findOne({
+                where: { username },
+                include: {
+                    model: userGameBiodata,
+                    as: 'user_game_biodata',
+                    attributes: ['name'],
+                    required: true
+                }
+            })
+
+            const match = await bcrypt.compare(password, user.password)
+            if (match) {
+                const token = await generateToken(user)
+                res.status(200).json(responseSuccess({ token }))
+            }
+        } catch (err) {
+            console.log(err)
+            res.status(400).json(responseError('Username or Password is wrong'))
         }
     }
 }

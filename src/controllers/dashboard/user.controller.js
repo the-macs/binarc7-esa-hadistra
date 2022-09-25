@@ -111,7 +111,15 @@ module.exports = {
         const { id, name, role, password, passwordConfirmation } = req.body
 
         try {
-            const user = await userGame.findOne({ where: { id } })
+            const user = await userGame.findOne({
+                where: { id },
+                include: {
+                    model: userGameBiodata,
+                    as: 'user_game_biodata',
+                    attributes: ['name'],
+                    required: true
+                }
+            })
 
             let hashedPassword = user.password
 
@@ -138,7 +146,7 @@ module.exports = {
                         }, { where: { user_game_id: id }, transaction })
                     })
 
-                    const token = await generateToken(id)
+                    const token = await generateToken(user)
 
                     req.header.authorization = token
 
